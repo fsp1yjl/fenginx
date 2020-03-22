@@ -11,6 +11,7 @@ type Connection struct {
 	ConnId    int
 	Conn      *net.TCPConn
 	HandleAPI face.HandleFunc
+	Router    face.IRouter
 }
 
 func (c *Connection) Start() {
@@ -20,7 +21,7 @@ func (c *Connection) Start() {
 		buf := make([]byte, 512)
 
 		conn := c.GetTCPConnection()
-		cnt, err := conn.Read(buf)
+		_, err := conn.Read(buf)
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -29,7 +30,15 @@ func (c *Connection) Start() {
 			continue
 		}
 
-		c.HandleAPI(c.Conn, buf, cnt)
+		req := Request{
+			data: buf,
+			conn: c,
+		}
+
+		// go c.Router.handle(req)
+		go func(req face.IRequest) {
+			c.Router.Handle(req)
+		}(&req)
 	}
 
 }
@@ -49,12 +58,12 @@ func (c *Connection) GetConnId() int {
 func (c *Connection) RemoteAddr() {
 }
 
-func NewConnection(conn *net.TCPConn, connId int, callbackAPI face.HandleFunc) face.IConnection {
+func NewConnection(conn *net.TCPConn, connId int, r face.IRouter) face.IConnection {
 
 	c := &Connection{
-		ConnId:    connId,
-		Conn:      conn,
-		HandleAPI: callbackAPI,
+		ConnId: connId,
+		Conn:   conn,
+		Router: r,
 	}
 
 	return c

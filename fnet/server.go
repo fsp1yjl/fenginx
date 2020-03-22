@@ -11,15 +11,7 @@ type Server struct {
 	IpVersion string
 	Ip        string
 	Port      string
-}
-
-func handleFunc(c *net.TCPConn, buf []byte, cnt int) error {
-
-	if _, err := c.Write(buf[:cnt]); err != nil {
-		fmt.Println("write error:", err)
-		return err
-	}
-	return nil
+	Router    face.IRouter
 }
 
 func (s *Server) Start() {
@@ -47,7 +39,7 @@ func (s *Server) Start() {
 				continue
 			}
 
-			conn := NewConnection(c, connID, handleFunc)
+			conn := NewConnection(c, connID, s.Router)
 			go conn.Start()
 
 			connID++
@@ -66,6 +58,10 @@ func (s *Server) Serve() {
 	// do someting
 
 	select {}
+}
+
+func (s *Server) AddRouter(r face.IRouter) {
+	s.Router = r
 }
 
 func NewServer(name string) face.IServer {

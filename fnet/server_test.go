@@ -1,6 +1,7 @@
 package fnet
 
 import (
+	face "fenginx/finterface"
 	"fmt"
 	"net"
 	"testing"
@@ -23,6 +24,20 @@ func ClientTest() {
 	return
 }
 
+type TestRouter struct {
+	BaseRouter
+}
+
+func (t *TestRouter) Handle(req face.IRequest) {
+
+	c := req.Connection().GetTCPConnection()
+	d := req.Data()
+	if _, err := c.Write(d); err != nil {
+		fmt.Println("write error:", err)
+	}
+
+}
+
 func Test(t *testing.T) {
 
 	/*
@@ -30,7 +45,7 @@ func Test(t *testing.T) {
 	*/
 	//1 创建一个server 句柄 s
 	s := NewServer("fenginx server0.01")
-
+	s.AddRouter(&TestRouter{})
 	/*
 		客户端测试
 	*/
