@@ -13,6 +13,15 @@ type Server struct {
 	Port      string
 }
 
+func handleFunc(c *net.TCPConn, buf []byte, cnt int) error {
+
+	if _, err := c.Write(buf[:cnt]); err != nil {
+		fmt.Println("write error:", err)
+		return err
+	}
+	return nil
+}
+
 func (s *Server) Start() {
 	go func() {
 		fmt.Println("STARTING ......")
@@ -29,31 +38,20 @@ func (s *Server) Start() {
 			return
 		}
 		fmt.Println("server listen success")
-
+		connID := 0
 		for {
 
-			conn, err := listenner.AcceptTCP()
+			c, err := listenner.AcceptTCP()
 			if err != nil {
 				fmt.Println("accept error:", err)
 				continue
 			}
-			go func() {
-				for {
-					buf := make([]byte, 512)
 
-					cnt, err := conn.Read(buf)
-					if err != nil {
-						fmt.Println("read error:", err)
-						continue
-					}
+			conn := NewConnection(c, connID, handleFunc)
+			go conn.Start()
 
-					if _, err := conn.Write(buf[:cnt]); err != nil {
-						fmt.Println("write error:", err)
-						continue
-					}
-				}
+			connID++
 
-			}()
 		}
 	}()
 }
