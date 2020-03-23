@@ -2,6 +2,7 @@ package fnet
 
 import (
 	face "fenginx/finterface"
+	"fenginx/utils"
 	"fmt"
 	"net"
 )
@@ -64,12 +65,12 @@ func (s *Server) AddRouter(r face.IRouter) {
 	s.Router = r
 }
 
-func NewServer(name string) face.IServer {
+func NewServer() face.IServer {
 	s := &Server{
-		Name:      name,
+		Name:      utils.G.Name,
 		IpVersion: "tcp4",
-		Ip:        "0.0.0.0",
-		Port:      "8889",
+		Ip:        utils.G.Host,
+		Port:      utils.G.Port,
 	}
 
 	return s

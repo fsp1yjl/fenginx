@@ -3,6 +3,7 @@ package main
 import (
 	face "fenginx/finterface"
 	fnet "fenginx/fnet"
+	utils "fenginx/utils"
 	"fmt"
 )
 
@@ -21,7 +22,10 @@ func (t *TestRouter) Handle(req face.IRequest) {
 }
 
 func main() {
-	s := fnet.NewServer("test server")
+	//加载配置文件
+	utils.G.LoadConfig()
+
+	s := fnet.NewServer()
 	s.AddRouter(&TestRouter{})
 	s.Serve()
 }

@@ -2,6 +2,7 @@ package fnet
 
 import (
 	face "fenginx/finterface"
+	utils "fenginx/utils"
 	"fmt"
 	"net"
 	"testing"
@@ -43,8 +44,11 @@ func Test(t *testing.T) {
 	/*
 		服务端测试
 	*/
-	//1 创建一个server 句柄 s
-	s := NewServer("fenginx server0.01")
+	// 加载配置文件
+	utils.G.LoadConfig()
+
+	// 创建一个server 句柄 s
+	s := NewServer()
 	s.AddRouter(&TestRouter{})
 	/*
 		客户端测试
