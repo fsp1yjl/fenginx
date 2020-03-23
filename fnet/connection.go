@@ -18,20 +18,50 @@ func (c *Connection) Start() {
 	defer fmt.Printf("connection handle func finishe, connid:,%d \n", c.ConnId)
 	for {
 
-		buf := make([]byte, 512)
+		// buf := make([]byte, 512)
 
 		conn := c.GetTCPConnection()
-		_, err := conn.Read(buf)
-		if err != nil {
+		// _, err := conn.Read(buf)
+		// if err != nil {
+		// 	if err == io.EOF {
+		// 		break
+		// 	}
+		// 	fmt.Println("read error:", err)
+		// 	continue
+		// }
+
+		p := &MsgPack{}
+		// msg := &Message{}
+		headerLen := p.HeaderLen()
+
+		headerData := make([]byte, headerLen)
+
+		if _, err := io.ReadFull(conn, headerData); err != nil {
 			if err == io.EOF {
+				fmt.Println("客户端断开连接")
 				break
 			}
-			fmt.Println("read error:", err)
+			fmt.Println("read msg head error ", err)
 			continue
 		}
 
+		fmt.Println("start header unpack....")
+		msg, err := p.UnPack(headerData)
+		if err != nil {
+			fmt.Println("unpack msg header error: ", err)
+			continue
+		}
+
+		fmt.Println("after header unpack....", msg.GetLength())
+
+		msgData := make([]byte, msg.GetLength())
+		if _, err := io.ReadFull(conn, msgData); err != nil {
+			fmt.Println("read msg body error ", err)
+			continue
+		}
+		msg.SetData(msgData)
 		req := Request{
-			data: buf,
+			msg:  msg,
 			conn: c,
 		}
 

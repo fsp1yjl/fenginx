@@ -9,4 +9,6 @@
 在每个连接请求的connection进行进一步封装，将请求信息封装为一个request对象，然后抽象出一个router对象，用于对request进行实际对业务逻辑处理。
 router对象可由用户在创建server的时候指定，并通过绑定到server，在每次创建connection到时候传递过去，最后在connection的每次请求处理时， 调用router的Handle方法去处理请求业务。
 
-> tag 0.04 增加全局配置文件模块
+> tag 0.04 增加全局配置文件模块 （未实现从文件加载配置文件的具体逻辑）
+
+>tag 0.05  对请求进行进一步封装，将请求内容封装为Message对象，请求内容使用基本对type-length-value格式进行定义，并定义一个MsgPack对象来对收发二进制数据流进行封包/拆包为Message对象

@@ -3,12 +3,12 @@ package fnet
 import face "fenginx/finterface"
 
 type Request struct {
-	data []byte
+	msg  face.IMessage
 	conn face.IConnection
 }
 
 func (r *Request) Data() []byte {
-	return r.data
+	return r.msg.GetData()
 }
 
 func (r *Request) Connection() face.IConnection {
