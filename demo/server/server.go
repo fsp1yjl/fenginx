@@ -4,7 +4,6 @@ import (
 	face "fenginx/finterface"
 	fnet "fenginx/fnet"
 	utils "fenginx/utils"
-	"fmt"
 )
 
 type TestRouter struct {
@@ -13,12 +12,16 @@ type TestRouter struct {
 
 func (t *TestRouter) Handle(req face.IRequest) {
 
-	c := req.Connection().GetTCPConnection()
-	d := req.Data()
-	if _, err := c.Write(d); err != nil {
-		fmt.Println("write error:", err)
-	}
+	c := req.Connection()
 
+	d := req.Data()
+
+	// 如下4步骤可以封装到connection struct中
+	// msg := fnet.NewMessage(req.MsgID(), d)
+	// p := &fnet.MsgPack{}
+	// msgByte, _ := p.Pack(msg)
+	// c.MsgChan <- msgByte
+	c.SendMsg(req.MsgID(), d)
 }
 
 type Test2Router struct {
@@ -27,13 +30,10 @@ type Test2Router struct {
 
 func (t *Test2Router) Handle(req face.IRequest) {
 
-	c := req.Connection().GetTCPConnection()
-	d := req.Data()
-	dd := []byte("test2 router.....")
-	d = append(d, dd...)
-	if _, err := c.Write(d); err != nil {
-		fmt.Println("write error:", err)
-	}
+	c := req.Connection()
+	// c := (req.Connection()).(*fnet.Connection)
+
+	c.SendMsg(req.MsgID(), req.Data())
 
 }
 

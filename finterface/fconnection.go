@@ -7,8 +7,8 @@ import (
 type IConnection interface {
 	GetTCPConnection() *net.TCPConn
 	GetConnId() int
-	RemoteAddr()
-	// Send()
+	RemoteAddr() net.Addr
+	SendMsg(msgID uint32, data []byte)
 	Start()
 	Stop()
 }

@@ -13,6 +13,6 @@ router对象可由用户在创建server的时候指定，并通过绑定到serve
 
 >tag 0.05  对请求进行进一步封装，将请求内容封装为Message对象，请求内容使用基本对type-length-value格式进行定义，并定义一个MsgPack对象来对收发二进制数据流进行封包/拆包为Message对象
 
-
 > tag 0.06 server创建的时候支持多路路由
 
+> tag 0.07 connect处理中，进行读写分离. 并在connection中增加SendMsg方法

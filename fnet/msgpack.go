@@ -52,6 +52,10 @@ func (p *MsgPack) Pack(msg face.IMessage) ([]byte, error) {
 	return dataBuff.Bytes(), nil
 }
 
+func (p *MsgPack) NewMsgPack() face.IMsgPack {
+	return &MsgPack{}
+}
+
 //获取msg字节流包头字节数
 func (p MsgPack) HeaderLen() uint32 {
 	//这里设计包头为8字节， 其中msg id 4字节，msg data length 4字节

@@ -12,23 +12,13 @@ type Connection struct {
 	Conn      *net.TCPConn
 	HandleAPI face.HandleFunc
 	Routers   face.IRouters
+	MsgChan   chan []byte
 }
 
-func (c *Connection) Start() {
-	defer fmt.Printf("connection handle func finishe, connid:,%d \n", c.ConnId)
+func (c *Connection) StartReader() {
 	for {
 
-		// buf := make([]byte, 512)
-
 		conn := c.GetTCPConnection()
-		// _, err := conn.Read(buf)
-		// if err != nil {
-		// 	if err == io.EOF {
-		// 		break
-		// 	}
-		// 	fmt.Println("read error:", err)
-		// 	continue
-		// }
 
 		p := &MsgPack{}
 		// msg := &Message{}
@@ -74,6 +64,27 @@ func (c *Connection) Start() {
 
 		}(&req)
 	}
+}
+
+func (c *Connection) StartWrite() {
+
+	defer fmt.Println(c.RemoteAddr().String(), " conn Writer exit!")
+	for {
+		select {
+		case data := <-c.MsgChan:
+			//有数据要写给客户端
+			if _, err := c.Conn.Write(data); err != nil {
+				fmt.Println("Send Data error:, ", err, " Conn Writer exit")
+				return
+			}
+		}
+	}
+}
+
+func (c *Connection) Start() {
+	defer fmt.Printf("connection handle func finishe, connid:,%d \n", c.ConnId)
+	go c.StartReader()
+	go c.StartWrite()
 
 }
 
@@ -89,7 +100,18 @@ func (c *Connection) GetConnId() int {
 	return c.ConnId
 }
 
-func (c *Connection) RemoteAddr() {
+func (c *Connection) RemoteAddr() net.Addr {
+	return c.Conn.RemoteAddr()
+}
+
+func (c *Connection) SendMsg(msgID uint32, data []byte) {
+
+	//先对数据进行封包
+	msg := NewMessage(msgID, data)
+	p := &MsgPack{}
+	msgByte, _ := p.Pack(msg)
+
+	c.MsgChan <- msgByte
 }
 
 func NewConnection(conn *net.TCPConn, connId int, r face.IRouters) face.IConnection {
@@ -98,6 +120,7 @@ func NewConnection(conn *net.TCPConn, connId int, r face.IRouters) face.IConnect
 		ConnId:  connId,
 		Conn:    conn,
 		Routers: r,
+		MsgChan: make(chan []byte),
 	}
 
 	return c
