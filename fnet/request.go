@@ -11,6 +11,10 @@ func (r *Request) Data() []byte {
 	return r.msg.GetData()
 }
 
+func (r *Request) MsgID() uint32 {
+	return r.msg.GetID()
+}
+
 func (r *Request) Connection() face.IConnection {
 	return r.conn
 }

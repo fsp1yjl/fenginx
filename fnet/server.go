@@ -12,7 +12,7 @@ type Server struct {
 	IpVersion string
 	Ip        string
 	Port      string
-	Router    face.IRouter
+	Routers   face.IRouters
 }
 
 func (s *Server) Start() {
@@ -40,7 +40,7 @@ func (s *Server) Start() {
 				continue
 			}
 
-			conn := NewConnection(c, connID, s.Router)
+			conn := NewConnection(c, connID, s.Routers)
 			go conn.Start()
 
 			connID++
@@ -61,8 +61,8 @@ func (s *Server) Serve() {
 	select {}
 }
 
-func (s *Server) AddRouter(r face.IRouter) {
-	s.Router = r
+func (s *Server) AddRouter(msgID uint32, r face.IRouter) {
+	s.Routers.SetRouter(msgID, r)
 }
 
 func NewServer() face.IServer {
@@ -71,6 +71,7 @@ func NewServer() face.IServer {
 		IpVersion: "tcp4",
 		Ip:        utils.G.Host,
 		Port:      utils.G.Port,
+		Routers:   NewRouters(),
 	}
 
 	return s

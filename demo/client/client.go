@@ -11,7 +11,7 @@ func main() {
 	conn, _ := net.Dial("tcp4", "0.0.0.0:8889")
 
 	msg := fnet.Message{}
-	msg.SetID(1)
+	msg.SetID(2)
 	msg.SetData([]byte("hello,eric"))
 	len := uint32(len(msg.GetData()))
 	fmt.Println("lenlllll--:", len)

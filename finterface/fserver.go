@@ -7,5 +7,5 @@ type IServer interface {
 
 	Serve()
 
-	AddRouter(r IRouter)
+	AddRouter(msgId uint32, r IRouter)
 }
