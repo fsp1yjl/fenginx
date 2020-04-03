@@ -16,3 +16,5 @@ router对象可由用户在创建server的时候指定，并通过绑定到serve
 > tag 0.06 server创建的时候支持多路路由
 
 > tag 0.07 connect处理中，进行读写分离. 并在connection中增加SendMsg方法
+
+> tag 0.08 增加请求处理消息队列和处理请求的worker池来取代无限增加的goroutine线程

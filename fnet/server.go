@@ -31,6 +31,7 @@ func (s *Server) Start() {
 			return
 		}
 		fmt.Println("server listen success")
+		s.Routers.WorkerPoolStart()
 		connID := 0
 		for {
 

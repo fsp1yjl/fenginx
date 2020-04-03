@@ -50,19 +50,25 @@ func (c *Connection) StartReader() {
 			continue
 		}
 		msg.SetData(msgData)
-		req := Request{
+		req := &Request{
 			msg:  msg,
 			conn: c,
 		}
 
-		// go c.Router.handle(req)
-		go func(req face.IRequest) {
-			router := c.Routers.GetRouter(msg.GetID())
-			if router != nil {
-				router.Handle(req)
-			}
+		if c.Routers.GetWorkerPoolCount() > 0 {
+			c.Routers.SendRequestToWorker(req)
+		} else {
+			c.Routers.RequestHandle(req)
+		}
 
-		}(&req)
+		// go c.Router.handle(req)
+		// go func(req face.IRequest) {
+		// 	router := c.Routers.GetRouter(msg.GetID())
+		// 	if router != nil {
+		// 		router.Handle(req)
+		// 	}
+
+		// }(req)
 	}
 }
 
